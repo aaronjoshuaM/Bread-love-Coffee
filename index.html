@@ -1,656 +1,524 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bread love & Coffee</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-  <style>
-    body {
-      background-color:  rgb(238, 219, 195);
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <title>Coffee, Love & Bread</title>
+    <style>
+        :root {
+            --primary-color: #6B3E2E;  
+            --secondary-color: #D2691E;  
+            --accent-color: #F4A460;     
+            --light-color: #FFF8DC;      
+        }
 
-    .sidebar {
-      background-color: rgb(45, 40, 40);
-      min-height: 100vh;
-      text-align: center;
-      padding: 2em 1em;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .sidebar p {
-      color: white;
-      font-weight: 400;
-      font-size: x-large;
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--light-color);
+            line-height: 1.6;
+        }
 
-    .sidebar h2 {
-      color: white;
-      font-size: 1.8em;
-      margin-bottom: 1em;
-    }
+        .navigation {
+            background: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-    .sidebar img {
-      width: 200px;
-      height: 200px;
-      object-fit: cover;
-    }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
 
-    .sidebar nav a {
-      color: white;
-      font-size: large;
-      text-decoration: none;
-      display: block;
-      margin: 0.5em 0;
-      padding: 0.5em;
-      border-radius: 5px;
-    }
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
 
-    .sidebar nav a.active,
-    .sidebar nav a:hover {
-      background-color: brown;
-      color: white;
-      font-weight: bold;
-    }
+        .navigation a:hover {
+            color: var(--accent-color);
+        }
 
-    .main-content section {
-      display: none;
-      padding: 3em 1em;
-    }
+        .cart-icon {
+            color: white;
+            cursor: pointer;
+            position: relative;
+        }
 
-    .main-content section.active {
-      display: block;
-    }
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7em;
+        }
 
-    footer {
-      font-size: 0.8em;
-      color: #ffffff;
-      text-align: center;
-      margin-top: 2em;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    .cart {
-      background-color: rgb(70, 60, 60);
-      color: white;
-      padding: 1em;
-      margin-bottom: 2em;
-      border-radius: 5px;
-    }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            display: none; /* Initially hide all sections */
+        }
 
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5em;
-    }
+        .menu-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
 
-    .cart-item .product-name {
-      flex: 1;
-    }
+        .featured-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
 
-    .cart-total {
-      font-weight: bold;
-      margin-top: 1em;
-    }
+        .menu-card:hover {
+            transform: scale(1.05);
+        }
 
-    .order-success {
-      display: none;
-      background-color: green;
-      color: white;
-      padding: 1em;
-      border-radius: 5px;
-      margin-top: 1em;
-    }
+        .menu-card img {
+            max-width: 180px; /* Smaller image size */
+            height: auto;
+            object-fit: cover;
+            border-radius: 8px;
+        }
 
-    #cart-icon {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      font-size: 2em;
-      background-color: #ff5c5c;
-      color: white;
-      padding: 0.5em;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    }
+        .add-to-cart-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
 
-    #cart-details {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 2em;
-      border-radius: 10px;
-      display: none;
-      width: 60%;
-      max-width: 400px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    }
+        .add-to-cart-button:hover {
+            background: var(--secondary-color);
+        }
 
-    #cart-details h4 {
-      margin-bottom: 1em;
-    }
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
 
-    #cart-details .close-cart {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 1.5em;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
+        .cart-content {
+            background: white;
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .about-us {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .comments-section {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .comment-form input, 
+        .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .comments-list {
+            margin-top: 20px;
+        }
+
+        .single-comment {
+            background: #f4f4f4;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row">
-    
-      <div class="col-md-3 sidebar">
-        <img src="logo.png" alt="Profile" class="rounded-circle mb-3">
-        <h2>Coffee & Bread</h2>
-        <p>Freshly brewed coffee, artisan bread, and delightful cookies.</p>
-        
-        <nav class="nav flex-column">
-          <a class="nav-link active" href="#home" data-section="home" aria-current="page">Home</a>
-          <a class="nav-link" href="#coffee" data-section="coffee">Coffee</a>
-          <a class="nav-link" href="#bread" data-section="bread">Bread</a>
-          <a class="nav-link" href="#cookies" data-section="cookies">Cookies</a>
-
-        </nav>
-        <footer>
-          <p>© 2024 Coffee & Bakery</p>
-          <p>09182933038</p>
-          <p>124 General Alejandro St. </p>
-          <p>Brgy Bagong Silangan</p>
-          <p>Quezon city, Bagong</p>
-          <p>Metro Manila, Metro Manila, 1119</p>
-        </footer>
-      </div>
-
-      <div class="col-md-9 main-content">
-        <section id="home" class="active">
-          <h1>Welcome to Bread love & Coffee</h1>
-          <p>Serving the finest coffee, bread, and cookies daily.</p>
-          <h3>Welcome to Bread love & Coffee, where tradition meets deliciousness in every bite! We are passionate about bringing the flavors of Filipino heritage into your daily life with our freshly baked breads, lovingly crafted from the finest ingredients.
-
-            Our story began with a simple goal – to share the rich history of Filipino bread-making with the world. From the soft, sweet taste of pan de sal to the creamy, melt-in-your-mouth goodness of ensaymada, we are dedicated to perfecting these timeless recipes passed down through generations. Each loaf and pastry we make is a tribute to the vibrant culinary culture of the Philippines.
-            
-            At Bread love & Coffee, we believe that every bread should tell a story. Our bakers honor age-old Filipino baking techniques, combined with a touch of modern innovation, to create the perfect balance of tradition and taste. Whether you're craving a classic pan de coco or an indulgent hopia, we’ve got something for everyone to enjoy.
-            
-            Join us on this delicious journey, where every bite brings you closer to the heart of Filipino flavor!
-            
-            </h3>
-        </section>
-
-        <section id="coffee">
-            <h2>Coffee</h2>
-            <p>Experience the perfect cup of coffee brewed just for you.</p>
-            <div class="row">
-             
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="mocha.webp" alt="Mocha" class="img-fluid" style="max-height:200px;">
-                <p>Mocha</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Mocha" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="espresso.jpg" alt="Cappuccino" class="img-fluid" style="max-height:200px;">
-                <p>Cappuccino</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Cappuccino" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Flat White.webp" alt="Flat White" class="img-fluid" style="max-height:200px;">
-                <p>Flat White</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Flat White" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="americano.webp" alt="Americano" class="img-fluid" style="max-height:200px;">
-                <p>Americano</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Americano" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="espresso.jpg" alt="Espresso" class="img-fluid" style="max-height:200px;">
-                <p>Espresso</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Espresso" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="macchiato.webp" alt="Macchiato" class="img-fluid" style="max-height:200px;">
-                <p>Macchiato</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Macchiato" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="cortado.webp" alt="Cortado" class="img-fluid" style="max-height:200px;">
-                <p>Cortado</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Cortado" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="latte.jpg" alt="Latte" class="img-fluid" style="max-height:200px;">
-                <p>Latte</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Latte" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Affogato.avif" alt="Affogato" class="img-fluid" style="max-height:200px;">
-                <p>Affogato</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Affogato" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Café au lait.jpg" alt="Café au Lait" class="img-fluid" style="max-height:200px;">
-                <p>Café au Lait</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Café au Lait" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Doppio.webp" alt="Doppio" class="img-fluid" style="max-height:200px;">
-                <p>Doppio</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Doppio" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Iced coffee.webp" alt="Iced Coffee" class="img-fluid" style="max-height:200px;">
-                <p>Iced Coffee</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Iced Coffee" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="_Latte_coffee.webp" alt="Lattes" class="img-fluid" style="max-height:200px;">
-                <p>Lattes</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Lattes" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Long_Black_.webp" alt="Long Black" class="img-fluid" style="max-height:200px;">
-                <p>Long Black</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Long Black" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="cold-brew.jpg" alt="Cold Brew" class="img-fluid" style="max-height:200px;">
-                <p>Cold Brew</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Cold Brew" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Frappe.webp" alt="Frappé" class="img-fluid" style="max-height:200px;">
-                <p>Frappé</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Frappé" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Cuban_Espresso.webp" alt="Cuban Espresso" class="img-fluid" style="max-height:200px;">
-                <p>Cuban Espresso</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Cuban Espresso" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Irish_Coffee.webp" alt="Irish Coffee" class="img-fluid" style="max-height:200px;">
-                <p>Irish Coffee</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Irish Coffee" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="turkish.png" alt="Turkish Coffee" class="img-fluid" style="max-height:200px;">
-                <p>Turkish Coffee</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Turkish Coffee" data-price="100">Add to Cart</button>
-              </div>
-              <div class="col-md-3 mb-3" style="text-align:center;">
-                <img src="Galao.webp" alt="Galão" class="img-fluid" style="max-height:200px;">
-                <p>Galão</p>
-                <p class="product-price">₱100</p>
-                <button class="btn btn-primary add-to-cart" data-product="Galão" data-price="100">Add to Cart</button>
-              </div>
-            </div>
-          </section>
-          
-          <section id="bread">
-            <h2>Bread</h2>
-            <p>Freshly baked bread with traditional recipes and local flavors.</p>
-            <div class="row">
-              
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="ensaymada.jpg" alt="Ensaymada" class="img-fluid" style="max-height:150px;">
-                    <p>Ensaymada</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Ensaymada" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="pandecoco.webp" alt="Pan de Coco" class="img-fluid" style="max-height:150px;">
-                    <p>Pan de Coco</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Pan de Coco" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="monay.jpg" alt="Monay" class="img-fluid" style="max-height:150px;">
-                    <p>Monay</p>
-                    <p class="product-price">₱75</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Monay" data-price="75">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Pandesal.webp" alt="Pandesal" class="img-fluid" style="max-height:150px;">
-                    <p>Pandesal</p>
-                    <p class="product-price">₱50</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Pandesal" data-price="50">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="spanish.webp" alt="Spanish Bread" class="img-fluid" style="max-height:150px;">
-                    <p>Spanish Bread</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Spanish Bread" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="bukopie.jpg" alt="Buko Pie" class="img-fluid" style="max-height:150px;">
-                    <p>Buko Pie</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Buko Pie" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="putok.jpg" alt="Putok" class="img-fluid" style="max-height:150px;">
-                    <p>Putok</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Putok" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="cheesebread.webp" alt="Cheese Bread" class="img-fluid" style="max-height:150px;">
-                    <p>Cheese Bread</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Cheese Bread" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="hopia.jpg" alt="Hopia" class="img-fluid" style="max-height:150px;">
-                    <p>Hopia</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Hopia" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="kababayan.webp" alt="Kababayan" class="img-fluid" style="max-height:150px;">
-                    <p>Kababayan</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Kababayan" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="mongobread.webp" alt="Monggo Bread" class="img-fluid" style="max-height:150px;">
-                    <p>Monggo Bread</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Monggo Bread" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="pianono.jpg" alt="Pianono" class="img-fluid" style="max-height:150px;">
-                    <p>Pianono</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Pianono" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="asadaoroll.jpg" alt="Asado Roll" class="img-fluid" style="max-height:150px;">
-                    <p>Asado Roll</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Asado Roll" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="panderegla.jpg" alt="Pan de Regla" class="img-fluid" style="max-height:150px;">
-                    <p>Pan de Regla</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Pan de Regla" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="pinagong.jpg" alt="Pinagong" class="img-fluid" style="max-height:150px;">
-                    <p>Pinagong</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Pinagong" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="siopao.webp" alt="Siopao" class="img-fluid" style="max-height:150px;">
-                    <p>Siopao</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Siopao" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="inipit.webp" alt="Inipit" class="img-fluid" style="max-height:150px;">
-                    <p>Inipit</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Inipit" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="pandeube.webp" alt="Pan de Ube" class="img-fluid" style="max-height:150px;">
-                    <p>Pan de Ube</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Pan de Ube" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="cremadefruta.jpg" alt="Crema de Fruta" class="img-fluid" style="max-height:150px;">
-                    <p>Crema de Fruta</p>
-                    <p class="product-price">₱175</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Crema de Fruta" data-price="175">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="empanada.jpg" alt="Empanada" class="img-fluid" style="max-height:150px;">
-                    <p>Empanada</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-product="Empanada" data-price="100">Add to Cart</button>
-                </div>
-            </div>
-        </section>
-        
-
-          
-        <section id="cookies">
-            <h2>Cookies</h2>
-            <p>A selection of freshly baked cookies, from traditional favorites to modern twists.</p>
-            <div class="row">
-               
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="chocolatechip.jpg" alt="Chocolate Chip Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Chocolate Chip Cookies</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Chocolate Chip Cookies" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="sugarcookies.jpg" alt="Sugar Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Sugar Cookies</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Sugar Cookies" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="butter.jpg" alt="Butter Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Butter Cookies</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Butter Cookies" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="shortbread.jpg" alt="Shortbread" class="img-fluid" style="max-height:150px;">
-                    <p>Shortbread</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Shortbread" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Snickerdoodles.jpg" alt="Snickerdoodles" class="img-fluid" style="max-height:150px;">
-                    <p>Snickerdoodles</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Snickerdoodles" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Biscotti.jpg" alt="Biscotti" class="img-fluid" style="max-height:150px;">
-                    <p>Biscotti</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Biscotti" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Black and white cookies.jpg" alt="Black and White Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Black and White Cookies</p>
-                    <p class="product-price">₱150</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Black and White Cookies" data-price="150">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Drop cookies.jpg" alt="Drop Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Drop Cookies</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Drop Cookies" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="macaroon.jpg" alt="Macaroons" class="img-fluid" style="max-height:150px;">
-                    <p>Macaroons</p>
-                    <p class="product-price">₱175</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Macaroons" data-price="175">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Peanut butter cookies.jpg" alt="Peanut Butter Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Peanut Butter Cookies</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Peanut Butter Cookies" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="ginger butter cookies.jpg" alt="Gingerbread Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Gingerbread Cookies</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Gingerbread Cookies" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Peanut butter blossoms.webp" alt="Peanut Butter Blossoms" class="img-fluid" style="max-height:150px;">
-                    <p>Peanut Butter Blossoms</p>
-                    <p class="product-price">₱140</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Peanut Butter Blossoms" data-price="140">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Crinkle cookies.webp" alt="Crinkle Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Crinkle Cookies</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Crinkle Cookies" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Fortune cookies.jpg" alt="Fortune Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Fortune Cookies</p>
-                    <p class="product-price">₱75</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Fortune Cookies" data-price="75">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Gingersnaps.jpg" alt="Gingersnaps" class="img-fluid" style="max-height:150px;">
-                    <p>Gingersnaps</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Gingersnaps" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Icebox cookies.webp" alt="Icebox Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Icebox Cookies</p>
-                    <p class="product-price">₱125</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Icebox Cookies" data-price="125">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Oatmeal raisin cookies.jpg" alt="Oatmeal Raisin Cookies" class="img-fluid" style="max-height:150px;">
-                    <p>Oatmeal Raisin Cookies</p>
-                    <p class="product-price">₱100</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Oatmeal Raisin Cookies" data-price="100">Add to Cart</button>
-                </div>
-                <div class="col-md-3 mb-3" style="text-align:center;">
-                    <img src="Cookie cake.webp" alt="Cookie Cake" class="img-fluid" style="max-height:150px;">
-                    <p>Cookie Cake</p>
-                    <p class="product-price">₱250</p>
-                    <button class="btn btn-primary add-to-cart" data-item="Cookie Cake" data-price="250">Add to Cart</button>
-                </div>
-            </div>
-        </section>
-        
-        
-        
+    <div class="navigation">
+        <div class="nav-links">
+            <a href="#home" onclick="filterCategory('home')">Home</a>
+            <a href="#bread" onclick="filterCategory('bread')">Bread</a>
+            <a href="#coffee" onclick="filterCategory('coffee')">Coffee</a>
+            <a href="#cookies" onclick="filterCategory('cookies')">Cookies</a>
+            <a href="#about" onclick="showAboutUs()">About Us</a>
         </div>
-      </div>
+        <div class="cart-icon" onclick="openCart()">
+            🛒 Cart <span class="cart-count" id="cartCount">0</span>
+        </div>
     </div>
-  
-    <div id="cart-icon">🛒 <span id="cart-count">0</span></div>
 
-    <div id="cart-details">
-      <span class="close-cart" id="close-cart">&times;</span>
-      <h4>Your Cart</h4>
-      <div id="cart-popup-items"></div>
-      <div class="cart-total">
-        Total: ₱<span id="cart-popup-total">0.00</span>
-      </div>
-      <button class="btn btn-success" id="place-order-popup">Place Order</button>
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <h2>Your Cart</h2>
+            <div id="cartItems"></div>
+            <p>Total: ₱<span id="cartTotal">0</span></p>
+            <button onclick="checkout()">Checkout</button>
+            <button onclick="closeCart()">Close</button>
+        </div>
     </div>
-    
-   
-    <div id="order-success" style="display:none; background-color: #4CAF50; color: white; padding: 10px; text-align: center; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); border-radius: 5px;">
-      Order placed successfully!
+
+    <div class="container">
+        <div class="menu-grid" id="bread">
+            <!-- Bread Section -->
+            <div class="menu-card" data-category="bread">
+                <div class="featured-badge">Best Seller</div>
+                <img src="pandesal.jpg" alt="Pan de Sal">
+                <h3>Pan de Sal</h3>
+                <p>Traditional Filipino bread roll</p>
+                <p>Price: ₱85</p>
+                <button class="add-to-cart-button" onclick="addToCart('Pan de Sal', 85)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="bread">
+                <div class="featured-badge">Best Seller</div>
+                <img src="spanish.jpg" alt="Pan de Sal">
+                <h3>Spanish Bread</h3>
+                <p>Soft, slightly sweet rolls with a buttery filling</p>
+                <p>Price: ₱85</p>
+                <button class="add-to-cart-button" onclick="addToCart('Spanish Bread', 85)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="bread">
+                <img src="hopia.jpg" alt="Hopia">
+                <h3>Hopia</h3>
+                <p> Flaky pastry filled with sweet bean paste.</p>
+                <p>Price: ₱50</p>
+                <button class="add-to-cart-button" onclick="addToCart('Hopia', 50)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="bread">
+                <img src="pandecoco.jpg" alt="Pandecoco">
+                <h3>Pandecoco</h3>
+                <p>Coconut-filled bread rolls</p>
+                <p>Price: ₱30</p>
+                <button class="add-to-cart-button" onclick="addToCart('Pandecoco', 30)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="bread">
+                <img src="panderegla.jpg" alt="Pan De Regla">
+                <h3>Pan De Regla</h3>
+                <p>Sweet, soft bread, commonly enjoyed with coffee.</p>
+                <p>Price: ₱55</p>
+                <button class="add-to-cart-button" onclick="addToCart('Pan De Regla', 55)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="bread">
+                <img src="cheesebread.jpg" alt="Cheese Bread">
+                <h3>Cheese Bread</h3>
+                <p>Bread with a cheesy twist</p>
+                <p>Price: ₱45</p>
+                <button class="add-to-cart-button" onclick="addToCart('Cheese Bread', 45)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="bread">
+                <img src="siopao.jpg" alt="Siopao">
+                <h3>Siopao</h3>
+                <p>Soft, steamed buns filled with savory meat.</p>
+                <p>Price: ₱75</p>
+                <button class="add-to-cart-button" onclick="addToCart('Siopao', 75)">Add to Cart</button>
+            </div>
+
+            <div class="menu-card" data-category="bread">
+                <img src="monay.jpg" alt="Monay">
+                <h3>Monay</h3>
+                <p>Dense, slightly sweet bread with a thick texture.</p>
+                <p>Price: ₱35</p>
+                <button class="add-to-cart-button" onclick="addToCart('Monay', 35)">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="menu-grid" id="coffee">
+            <!-- Coffee Section -->
+            
+            <div class="menu-card" data-category="coffee">
+                <div class="featured-badge">Best Seller</div>
+                <img src="galão.jpg" alt="Galão">
+                <h3>Galão</h3>
+                <p>Portuguese espresso with steamed milk and foam.</p>
+                <p>Price: ₱150</p>
+                <button class="add-to-cart-button" onclick="addToCart('Galão', 150)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <div class="featured-badge">Best Seller</div>
+                <img src="kapengbarako.jpg" alt="Kapeng Barako">
+                <h3>Kapeng Barako</h3>
+                <p>A robust and bold Filipino coffee</p>
+                <p>Price: ₱150</p>
+                <button class="add-to-cart-button" onclick="addToCart('Kapeng Barako', 150)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <img src="capuccino.jpg" alt="Cappuccino">
+                <h3>Cappuccino</h3>
+                <p>Classic espresso-based coffee with frothy milk</p>
+                <p>Price: ₱160</p>
+                <button class="add-to-cart-button" onclick="addToCart('Cappuccino', 160)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <img src="latte.jpg" alt="Latte">
+                <h3>Latte</h3>
+                <p>Espresso with steamed milk</p>
+                <p>Price: ₱180</p>
+                <button class="add-to-cart-button" onclick="addToCart('Latte', 180)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <img src="americano.jpg" alt="Americano">
+                <h3>Americano</h3>
+                <p>Espresso diluted with hot water</p>
+                <p>Price: ₱140</p>
+                <button class="add-to-cart-button" onclick="addToCart('Americano', 140)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <img src="mocha.jpg" alt="Mocha">
+                <h3>Mocha</h3>
+                <p>Espresso with chocolate and steamed milk</p>
+                <p>Price: ₱190</p>
+                <button class="add-to-cart-button" onclick="addToCart('Mocha', 190)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <img src="icedcoffee.jpg" alt="Iced Coffee">
+                <h3>Iced Coffee</h3>
+                <p>Refreshing chilled coffee</p>
+                <p>Price: ₱130</p>
+                <button class="add-to-cart-button" onclick="addToCart('Iced Coffee', 130)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="coffee">
+                <img src="affogato.jpg" alt="Affogato">
+                <h3>Affogato</h3>
+                <p>Espresso poured over vanilla ice cream</p>
+                <p>Price: ₱200</p>
+                <button class="add-to-cart-button" onclick="addToCart('Affogato', 200)">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="menu-grid" id="cookies">
+            <!-- Cookies Section -->
+            <div class="menu-card" data-category="cookies">
+                <div class="featured-badge">Best Seller</div>
+                <img src="polvoron.jpg" alt="Polvoron Cookies">
+                <h3>Polvoron Cookies</h3>
+                <p>Traditional Filipino shortbread</p>
+                <p>Price: ₱115</p>
+                <button class="add-to-cart-button" onclick="addToCart('Polvoron Cookies', 115)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <div class="featured-badge">Best Seller</div>
+                <img src="chocolatechip.jpg" alt="Choco Chip Cookies">
+                <h3>Choco Chip Cookies</h3>
+                <p>Chocolate chip goodness in every bite</p>
+                <p>Price: ₱130</p>
+                <button class="add-to-cart-button" onclick="addToCart('Choco Chip Cookies', 130)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <img src="oatmeal.jpg" alt="Oatmeal Cookies">
+                <h3>Oatmeal Cookies</h3>
+                <p>Healthy and delicious oatmeal cookies</p>
+                <p>Price: ₱120</p>
+                <button class="add-to-cart-button" onclick="addToCart('Oatmeal Cookies', 120)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <img src="peanut.jpg" alt="Peanut Butter Cookies">
+                <h3>Peanut Butter Cookies</h3>
+                <p>Nutty and chewy cookies</p>
+                <p>Price: ₱140</p>
+                <button class="add-to-cart-button" onclick="addToCart('Peanut Butter Cookies', 140)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <img src="sugar.jpg" alt="Sugar Cookies">
+                <h3>Sugar Cookies</h3>
+                <p>Sweet and simple sugar cookies</p>
+                <p>Price: ₱100</p>
+                <button class="add-to-cart-button" onclick="addToCart('Sugar Cookies', 100)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <img src="almond.jpg" alt="Almond Cookies">
+                <h3>Almond Cookies</h3>
+                <p>Crunchy and nutty almond cookies</p>
+                <p>Price: ₱135</p>
+                <button class="add-to-cart-button" onclick="addToCart('Almond Cookies', 135)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <img src="macadamia.jpg" alt="Macadamia Cookies">
+                <h3>Macadamia Cookies</h3>
+                <p>Crunchy cookies with macadamia nuts</p>
+                <p>Price: ₱150</p>
+                <button class="add-to-cart-button" onclick="addToCart('Macadamia Cookies', 150)">Add to Cart</button>
+            </div>
+            <div class="menu-card" data-category="cookies">
+                <img src="doublechocolate.jpg" alt="Double Chocolate Cookies">
+                <h3>Double Chocolate Cookies</h3>
+                <p>Chocolate cookies with double the chocolate</p>
+                <p>Price: ₱140</p>
+                <button class="add-to-cart-button" onclick="addToCart('Double Chocolate Cookies', 140)">Add to Cart</button>
+            </div>
+        </div>
+
+       
+        <div class="about-us" id="about">
+            <h2>Coffee, Love & Bread</h2>
+            <p>Welcome to Coffee, Love & Bread, where we serve the finest Filipino breads, aromatic coffee, and delightful cookies made with love. Our mission is to bring a taste of warmth and comfort to your day, whether you're here for a quick snack or a relaxing break.</p>
+        </div>
+
+        
+        <div class="comments-section">
+            <h2>Customer Comments</h2>
+            <form class="comment-form" id="commentForm">
+                <input type="text" id="commentName" placeholder="Your Name" required>
+                <textarea id="commentText" placeholder="Your Comment" required></textarea>
+                <button type="submit">Submit Comment</button>
+            </form>
+            <div class="comments-list" id="commentsList"></div>
+        </div>
     </div>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <script>
-      $(document).ready(function () {
         let cart = [];
-        let total = 0;
     
-        function updateCartDisplay() {
-          const cartCount = $('#cart-count');
-          cartCount.text(cart.length);
-          $('#cart-popup-total').text(total.toFixed(2));
-          updateCartPopup();
+        function addToCart(name, price) {
+            let existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ name, price, quantity: 1 });
+            }
+            updateCart();
         }
     
-        function updateCartPopup() {
-          const cartPopupItems = $('#cart-popup-items');
-          cartPopupItems.empty();
+        function updateCart() {
+            let cartItemsElement = document.getElementById('cartItems');
+            let cartTotalElement = document.getElementById('cartTotal');
+            let cartCountElement = document.getElementById('cartCount');
+            cartItemsElement.innerHTML = '';
     
-          cart.forEach(item => {
-            cartPopupItems.append(`
-              <div class="cart-item">
-                <span class="product-name">${item.product}</span>
-                <span>$${item.price}</span>
-              </div>
-            `);
-          });
+            let total = 0;
+            cart.forEach(item => {
+                let itemTotal = item.price * item.quantity;
+                total += itemTotal;
+    
+                let itemElement = document.createElement('div');
+                itemElement.classList.add('cart-item');
+                itemElement.innerHTML = `
+                    <span>${item.name} x${item.quantity}</span>
+                    <span>₱${itemTotal}</span>
+                    <button onclick="removeFromCart('${item.name}')">Remove</button>
+                `;
+                cartItemsElement.appendChild(itemElement);
+            });
+    
+            cartTotalElement.textContent = total;
+            cartCountElement.textContent = cart.reduce((sum, item) => sum + item.quantity, 0); // Fixed count logic
         }
     
-        $('.add-to-cart').on('click', function () {
-          const product = $(this).data('product');
-          const price = parseFloat($(this).data('price'));
+        function removeFromCart(name) {
+            cart = cart.filter(item => item.name !== name);
+            updateCart();
+        }
     
-          cart.push({ product, price });
-          total += price;
-          updateCartDisplay();
+        function openCart() {
+            document.getElementById('cartModal').style.display = 'flex';
+        }
+    
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+    
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            alert(`Thank you for your purchase! Total: ₱${total}`);
+            cart = [];
+            updateCart();
+            closeCart();
+        }
+    
+        document.getElementById('commentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let name = document.getElementById('commentName').value;
+            let comment = document.getElementById('commentText').value;
+            let commentsList = document.getElementById('commentsList');
+    
+            let commentElement = document.createElement('div');
+            commentElement.classList.add('single-comment');
+            commentElement.innerHTML = `
+                <strong>${name}</strong>
+                <p>${comment}</p>
+            `;
+            commentsList.prepend(commentElement);
+    
+            this.reset();
         });
     
-        $('#cart-icon').on('click', function () {
-          $('#cart-details').fadeIn();
-        });
+        function filterCategory(category) {
+            document.querySelectorAll('.menu-grid, .about-us').forEach(grid => {
+                grid.style.display = 'none';
+            });
+            document.getElementById(category).style.display = category === 'about' ? 'block' : 'grid';
+        }
     
-        $('#close-cart').on('click', function () {
-          $('#cart-details').fadeOut();
-        });
+        function showAboutUs() {
+            filterCategory('about');
+        }
     
-        $('#place-order-popup').on('click', function () {
-          
-          $('#order-success').fadeIn().delay(3000).fadeOut();
-          
-          
-          cart = [];
-          total = 0;
-          updateCartDisplay();
-          $('#cart-details').fadeOut();
-        });
-    
-        $('nav a').on('click', function (e) {
-          e.preventDefault();
-          $('nav a').removeClass('active');
-          $('.main-content section').removeClass('active');
-          $(this).addClass('active');
-          const section = $(this).data('section');
-          $(`#${section}`).addClass('active');
-        });
-      });
+        window.onload = function() {
+            filterCategory('bread'); 
+        };
     </script>
     
-  
- 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
